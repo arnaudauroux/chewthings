@@ -1,0 +1,13 @@
+.headerRoot {
+  background-color: #001529;
+  color: white;
+  padding-left: 2rem;
+  display: flex;
+  align-items: center;  
+  height: 100%;
+}
+
+.headerRoot span {
+  font-weight: 700;
+  font-size: large;
+}

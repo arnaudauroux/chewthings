@@ -1,10 +1,9 @@
 import React from 'react';
 import './shootings-list.component.css';
 import 'antd/dist/antd.css';
-import { Tooltip, Button, Modal, Empty, Input, Card, Spin, Icon, Avatar } from 'antd';
+import { Tooltip, Button, Modal, Empty, Input, Spin, Icon, notification } from 'antd';
 import * as AzureStorageBlob from '@azure/storage-blob';
-
-const { Meta } = Card;
+import ShootingCard from '../shooting-card/shooting-card.component';
 
 class ShootingsList extends React.Component {
 
@@ -48,6 +47,7 @@ class ShootingsList extends React.Component {
             visible: false
         });
 
+        this.openNotification();
         this.refreshShootingsList();
     }
 
@@ -65,6 +65,15 @@ class ShootingsList extends React.Component {
         });
     }
 
+    openNotification = () => {
+        notification.open({
+            message: 'Shooting créé',
+            description:
+                `Le dossier du shooting ${this.state.newShootingName} a été correctement créé !`,
+            icon: <Icon type='smile' style={{ color: '#108ee9' }} />,
+        });
+    }
+
     async refreshShootingsList() {
 
         const shootings: Array<AzureStorageBlob.BlobItem> = [];
@@ -73,9 +82,7 @@ class ShootingsList extends React.Component {
             shootings.push(blob);
         }
 
-        this.setState({
-            shootings
-        });
+        this.setState({ shootings });
     }
 
     render() {
@@ -84,26 +91,7 @@ class ShootingsList extends React.Component {
                 <div className='grid'>
                     {this.state.shootings.map((value, index) => {
                         return (
-                            <Card
-                                className='shooting-card'
-                                key={index}
-                                hoverable
-                                style={{ width: 300 }}
-                                cover={
-                                    <img
-                                        alt='example'
-                                        src='https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png' />
-                                }
-                                actions={[
-                                    <Icon type='setting' key='setting' />,
-                                    <Icon type='edit' key='edit' />,
-                                    <Icon type='ellipsis' key='ellipsis' />,
-                                ]}>
-                                <Meta
-                                    avatar={<Avatar src='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png' />}
-                                    title={value.name}
-                                    description={value.properties.lastModified.toDateString()} />
-                            </Card>
+                            <ShootingCard key={index} blob={value} />
                         );
                     })}
                 </div>

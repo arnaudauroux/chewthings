@@ -1,5 +1,5 @@
 .main-button {
-  position: absolute;
+  position: fixed;
   right: 0;
   bottom: 0;
   margin-right: 3rem;
@@ -24,8 +24,4 @@
   -webkit-flex-wrap: wrap; /* Safari 6.1+ */
   display: flex;
   flex-wrap: wrap;
-}
-
-.shooting-card {
-  margin: 1rem;
 }

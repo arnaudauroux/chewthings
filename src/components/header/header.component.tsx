@@ -7,7 +7,7 @@ class Header extends React.Component {
         return (
             <div className='headerRoot'>
                 <div className='logo' />
-                <span>ClickR</span>
+                <span>ChewThings</span>
             </div>
         );
     }

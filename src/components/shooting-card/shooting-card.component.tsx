@@ -2,22 +2,19 @@ import React from 'react';
 import './shooting-card.component.css';
 import 'antd/dist/antd.css';
 import { Card, Icon, Avatar } from 'antd';
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link,
-    useRouteMatch,
-    useParams
-} from "react-router-dom";
+import { withRouter } from 'react-router';
 
 const { Meta } = Card;
 
 class ShootingCard extends React.Component<any> {
+    redirectToShootingPage = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        this.props.history.push(`/${this.props.blob.name}`);
+    }
 
     render() {
         return (
             <Card
+                onClick={this.redirectToShootingPage}
                 className='shooting-card'
                 hoverable
                 cover={
@@ -35,14 +32,9 @@ class ShootingCard extends React.Component<any> {
                     avatar={<Avatar src='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png' />}
                     title={this.props.blob.name}
                     description={this.props.blob.properties.lastModified.toDateString()} />
-                <Switch>
-                    <Route path={this.props.blob.name}>
-                        {/* <Topic /> */}
-                    </Route>
-                </Switch>
             </Card>
         );
     }
 }
 
-export default ShootingCard;
+export default withRouter(ShootingCard);

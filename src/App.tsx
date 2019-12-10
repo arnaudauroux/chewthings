@@ -1,9 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Header from './components/header/header.component';
 import ShootingsList from './components/shootings-list/shootings-list.component';
 import 'antd/dist/antd.css';
 import './app.css';
+import Shooting from './components/shooting/shooting.component';
 
 class App extends React.Component {
 
@@ -13,11 +14,16 @@ class App extends React.Component {
         <div className='header'>
           <Header />
         </div>
-        <Router>
-          <div className='content'>
-            <ShootingsList />
-          </div>
-        </Router>
+        <div className='content'>
+          <Router>
+            <Switch>
+              <Route exact path='/'>
+                <ShootingsList />
+              </Route>
+              <Route path='/:shootingName' component={Shooting} />
+            </Switch>
+          </Router>
+        </div>
       </div>
     );
   }

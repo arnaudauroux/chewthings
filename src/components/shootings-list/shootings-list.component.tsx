@@ -1,9 +1,10 @@
 import React from 'react';
+import { Tooltip, Button, Modal, Empty, Input, Spin, Icon, notification } from 'antd';
+import ShootingCard from '../shooting-card/shooting-card.component';
+import ShootingsService from '../../services/shootings.service';
+import Shooting from '../../models/shooting.model';
 import './shootings-list.component.css';
 import 'antd/dist/antd.css';
-import { Tooltip, Button, Modal, Empty, Input, Spin, Icon, notification } from 'antd';
-import * as AzureStorageBlob from '@azure/storage-blob';
-import ShootingCard from '../shooting-card/shooting-card.component';
 
 class ShootingsList extends React.Component {
 
@@ -11,19 +12,15 @@ class ShootingsList extends React.Component {
         visible: false,
         creatingShooting: false,
         newShootingName: '',
-        shootings: Array<AzureStorageBlob.BlobItem>()
+        shootings: Array<Shooting>()
     };
 
-    containerClient: AzureStorageBlob.ContainerClient;
+    private shootingsService: ShootingsService;
 
     constructor(props: Readonly<{}>) {
         super(props);
 
-        const blobServiceClient = new AzureStorageBlob.BlobServiceClient(
-            'https://clickr.blob.core.windows.net/?sv=2019-02-02&ss=bfqt&srt=sco&sp=rwdlacup&se=2021-01-01T18:23:46Z&st=2019-12-07T10:23:46Z&spr=https&sig=mFvQ2fehDGKDFnLmaU0cZuWkFd%2BoglHL7lxPRLBfzk4%3D');
-
-        this.containerClient = blobServiceClient.getContainerClient('shootings');
-
+        this.shootingsService = new ShootingsService();
         this.refreshShootingsList();
     }
 
@@ -36,11 +33,7 @@ class ShootingsList extends React.Component {
     handleOk = async () => {
         this.setState({ creatingShooting: true });
 
-        const content = 'hello';
-
-        const blobClient = this.containerClient.getBlobClient(this.state.newShootingName);
-        const blockBlobClient = blobClient.getBlockBlobClient();
-        const uploadBlobResponse = await blockBlobClient.upload(content, content.length);
+        await this.shootingsService.createShootingAsync(this.state.newShootingName);
 
         this.setState({
             creatingShooting: false,
@@ -70,17 +63,12 @@ class ShootingsList extends React.Component {
             message: 'Shooting créé',
             description:
                 `Le dossier du shooting ${this.state.newShootingName} a été correctement créé !`,
-            icon: <Icon type='smile' style={{ color: '#108ee9' }} />,
+            icon: <Icon type='smile' style={{ color: '#108ee9' }} />
         });
     }
 
     async refreshShootingsList() {
-
-        const shootings: Array<AzureStorageBlob.BlobItem> = [];
-
-        for await (const blob of this.containerClient.listBlobsFlat()) {
-            shootings.push(blob);
-        }
+        const shootings = await this.shootingsService.getShootingsAsync();
 
         this.setState({ shootings });
     }
@@ -91,7 +79,7 @@ class ShootingsList extends React.Component {
                 <div className='grid'>
                     {this.state.shootings.map((value, index) => {
                         return (
-                            <ShootingCard key={index} blob={value} />
+                            <ShootingCard key={index} shooting={value} />
                         );
                     })}
                 </div>

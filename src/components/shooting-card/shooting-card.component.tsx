@@ -1,8 +1,8 @@
 import React from 'react';
-import './shooting-card.component.css';
-import 'antd/dist/antd.css';
 import { Card, Icon, Avatar } from 'antd';
 import { withRouter } from 'react-router';
+import './shooting-card.component.css';
+import 'antd/dist/antd.css';
 
 const { Meta } = Card;
 
@@ -30,8 +30,8 @@ class ShootingCard extends React.Component<any> {
                 ]}>
                 <Meta
                     avatar={<Avatar src='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png' />}
-                    title={this.props.blob.name}
-                    description={this.props.blob.properties.lastModified.toDateString()} />
+                    title={this.props.shooting.name}
+                    description={this.props.shooting.lastModified.toDateString()} />
             </Card>
         );
     }

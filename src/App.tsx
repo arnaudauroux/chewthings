@@ -17,9 +17,7 @@ class App extends React.Component {
         <div className='content'>
           <Router>
             <Switch>
-              <Route exact path='/'>
-                <ShootingsList />
-              </Route>
+              <Route exact path='/' component={ShootingsList} />
               <Route path='/:shootingName' component={Shooting} />
             </Switch>
           </Router>

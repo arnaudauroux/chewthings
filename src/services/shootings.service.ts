@@ -1,20 +1,28 @@
 import * as AzureStorageBlob from '@azure/storage-blob';
 import Shooting from '../models/shooting.model';
+import { BlockListType } from '@azure/storage-blob';
+import Photo from '../models/photo.model';
 
 class ShootingsService {
-    private containerClient: AzureStorageBlob.ContainerClient;
+    private blobServiceClient: AzureStorageBlob.BlobServiceClient;
 
     constructor() {
-        const blobServiceClient = new AzureStorageBlob.BlobServiceClient(
-            'https://clickr.blob.core.windows.net/?sv=2019-02-02&ss=bfqt&srt=sco&sp=rwdlacup&se=2021-01-01T18:23:46Z&st=2019-12-07T10:23:46Z&spr=https&sig=mFvQ2fehDGKDFnLmaU0cZuWkFd%2BoglHL7lxPRLBfzk4%3D');
-
-        this.containerClient = blobServiceClient.getContainerClient('shootings');
+        this.blobServiceClient = new AzureStorageBlob.BlobServiceClient(
+            'https://chewthingsstorage.blob.core.windows.net/?sv=2019-02-02&ss=bfqt&srt=sco&sp=rwdlacup&se=2021-12-01T20:37:39Z&st=2019-12-10T12:37:39Z&spr=https&sig=%2BpHHdFP3qdTRJTyhN9f63v5vkEmnRaWhD7uNXvrnINI%3D');
     }
 
     public async createShootingAsync(name: string) {
+        const containerClient = this.blobServiceClient.getContainerClient(name);
+
+        const createContainerResponse = await containerClient.create();
+    }
+
+    public async AddPhotoAsync(shootingName: string, name: string) {
+        const containerClient = this.blobServiceClient.getContainerClient(name);
+
         const content = 'hello';
 
-        const blobClient = this.containerClient.getBlobClient(name);
+        const blobClient = containerClient.getBlobClient(name);
         const blockBlobClient = blobClient.getBlockBlobClient();
         const uploadBlobResponse = await blockBlobClient.upload(content, content.length);
     }
@@ -22,8 +30,24 @@ class ShootingsService {
     public async getShootingsAsync(): Promise<Array<Shooting>> {
         const shootingNames: Array<Shooting> = [];
 
-        for await (const blob of this.containerClient.listBlobsFlat()) {
-            shootingNames.push({ name: blob.name, lastModified: blob.properties.lastModified });
+        for await (const container of this.blobServiceClient.listContainers()) {
+            shootingNames.push({ name: container.name, lastModified: container.properties.lastModified });
+        }
+
+        return shootingNames;
+    }
+
+    public async getShootingPhotosAsync(shootingName: string) {
+        const shootingNames: Array<Photo> = [];
+        const containerClient = this.blobServiceClient.getContainerClient(shootingName);
+
+        for await (const blob of containerClient.listBlobsFlat()) {
+            shootingNames.push({
+                uid: blob.name,
+                size: blob.properties.contentLength || 0,
+                name: blob.name,
+                lastModified: blob.properties.lastModified
+            });
         }
 
         return shootingNames;

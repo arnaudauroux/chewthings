@@ -8,7 +8,7 @@ const { Meta } = Card;
 
 class ShootingCard extends React.Component<any> {
     redirectToShootingPage = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        this.props.history.push(`/${this.props.blob.name}`);
+        this.props.history.push(`/${this.props.shooting.name}`);
     }
 
     render() {

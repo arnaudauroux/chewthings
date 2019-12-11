@@ -77,11 +77,7 @@ class ShootingsList extends React.Component {
         return (
             <React.Fragment>
                 <div className='grid'>
-                    {this.state.shootings.map((value, index) => {
-                        return (
-                            <ShootingCard key={index} shooting={value} />
-                        );
-                    })}
+                    {this.state.shootings.map((value, index) => <ShootingCard key={index} shooting={value} />)}
                 </div>
                 <Tooltip
                     placement='topLeft'

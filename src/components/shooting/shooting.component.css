@@ -1,0 +1,13 @@
+.shooting-photos-grid {
+    display: -webkit-flex; /* Safari */
+    -webkit-flex-wrap: wrap; /* Safari 6.1+ */
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.empty-status {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }

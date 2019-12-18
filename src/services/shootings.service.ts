@@ -17,14 +17,14 @@ class ShootingsService {
         const createContainerResponse = await containerClient.create();
     }
 
-    public async AddPhotoAsync(shootingName: string, name: string) {
+    public async AddPhotoAsync(shootingName: string, name: string, file: File) {
         const containerClient = this.blobServiceClient.getContainerClient(name);
 
         const content = 'hello';
 
         const blobClient = containerClient.getBlobClient(name);
         const blockBlobClient = blobClient.getBlockBlobClient();
-        const uploadBlobResponse = await blockBlobClient.upload(content, content.length);
+        const uploadBlobResponse = await blockBlobClient.uploadFile(file(content, content.length);
     }
 
     public async getShootingsAsync(): Promise<Array<Shooting>> {

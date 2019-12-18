@@ -5,9 +5,14 @@
     flex-wrap: wrap;
 }
 
-.empty-status {
-    height: 100%;
+.dragger {
+    width: 40rem !important;
+    height: 20rem !important;
+}
+
+.dragger-container {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
+    height: 100%;
+}

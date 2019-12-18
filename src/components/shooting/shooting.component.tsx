@@ -3,9 +3,10 @@ import { RouteChildrenProps } from 'react-router-dom';
 import './shooting.component.css';
 import 'antd/dist/antd.css';
 import Photo from '../../models/photo.model';
-import { Empty, Tooltip, Button, Modal, Input, Upload, Icon } from 'antd';
+import { Modal, Icon } from 'antd';
 import ShootingsService from '../../services/shootings.service';
-import { UploadFile } from 'antd/lib/upload/interface';
+import Dragger from 'antd/lib/upload/Dragger';
+import { RcCustomRequestOptions } from 'antd/lib/upload/interface';
 
 interface ShootingParams {
     shootingName: string;
@@ -27,11 +28,16 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
         this.refreshPhotosList();
     }
 
-    public refreshPhotosList() {
+    public async refreshPhotosList() {
         if (this.props.match) {
-            const photos = this.shootingsService.getShootingPhotosAsync(this.props.match.params.shootingName);
-            this.setState({ photos });
+            this.shootingsService.getShootingPhotosAsync(this.props.match.params.shootingName).then(photos => {
+                this.setState({ photos });
+            });
         }
+    }
+
+    upload = (options: RcCustomRequestOptions) => {
+        console.log(options);
     }
 
     handleChange = () => {
@@ -47,26 +53,31 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
     render() {
         return (
             <React.Fragment>
-                {/* <div className='shooting-photos-grid'>
-                    {this.state.photos.map((value, index) => {
-                        return <div></div>;
+                <div className='shooting-photos-grid'>
+                    {this.state.photos.map((photo: Photo, inde: number) => {
+                        return <div>{photo.name}</div>;
                     })}
-                </div> */}
-                <Upload
-                    listType='picture-card'
-                    fileList={this.state.photos.map(p => p as UploadFile)}
-                    onPreview={this.handlePreview}
-                    onChange={this.handleChange}
-                >
-                    <div>
-                        <Icon type='plus' />
-                        <div className='ant-upload-text'>Upload</div>
-                    </div>
-                </Upload>
+                </div>
+                <div className='dragger-container'>
+                    <Dragger
+                        customRequest={this.upload}
+                    className='dragger'
+                    showUploadList={false}
+                    name='file'
+                    multiple={true}>
+                    <p className='ant-upload-drag-icon'>
+                        <Icon type='inbox' />
+                    </p>
+                    <p className='ant-upload-text'>Click or drag file to this area to upload</p>
+                    <p className='ant-upload-hint'>
+                        Support for a single or bulk upload. Strictly prohibit from uploading company data or other
+                        band files
+                    </p>
+                    </Dragger>
+                </div>
                 <Modal visible={this.state.previewVisible} footer={null} onCancel={this.handleCancel}>
                     <img alt='example' style={{ width: '100%' }} src={this.state.previewImage} />
                 </Modal>
-                {this.state.photos.length === 0 ? <Empty className='empty-status' description='Aucune photo' /> : null}
             </React.Fragment >
         );
     }

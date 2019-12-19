@@ -1,6 +1,5 @@
 import * as AzureStorageBlob from '@azure/storage-blob';
 import Shooting from '../models/shooting.model';
-import { BlockListType } from '@azure/storage-blob';
 import Photo from '../models/photo.model';
 
 class ShootingsService {
@@ -12,19 +11,15 @@ class ShootingsService {
     }
 
     public async createShootingAsync(name: string) {
-        const containerClient = this.blobServiceClient.getContainerClient(name);
-
-        const createContainerResponse = await containerClient.create();
+        const createContainerResponse = await this.blobServiceClient.getContainerClient(name).create();
     }
 
     public async AddPhotoAsync(shootingName: string, name: string, file: File) {
-        const containerClient = this.blobServiceClient.getContainerClient(name);
-
-        const content = 'hello';
-
-        const blobClient = containerClient.getBlobClient(name);
-        const blockBlobClient = blobClient.getBlockBlobClient();
-        const uploadBlobResponse = await blockBlobClient.uploadFile(file(content, content.length);
+        await this.blobServiceClient
+            .getContainerClient(shootingName)
+            .getBlobClient(name)
+            .getBlockBlobClient()
+            .uploadBrowserData(file);
     }
 
     public async getShootingsAsync(): Promise<Array<Shooting>> {

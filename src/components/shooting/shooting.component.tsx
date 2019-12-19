@@ -36,8 +36,14 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
         }
     }
 
-    upload = (options: RcCustomRequestOptions) => {
-        console.log(options);
+    upload = async (options: RcCustomRequestOptions) => {
+        if (this.props.match) {
+            await this.shootingsService.AddPhotoAsync(
+                this.props.match.params.shootingName,
+                'test',
+                options.file
+            );
+        }
     }
 
     handleChange = () => {
@@ -61,17 +67,17 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
                 <div className='dragger-container'>
                     <Dragger
                         customRequest={this.upload}
-                    className='dragger'
-                    showUploadList={false}
-                    name='file'
-                    multiple={true}>
-                    <p className='ant-upload-drag-icon'>
-                        <Icon type='inbox' />
-                    </p>
-                    <p className='ant-upload-text'>Click or drag file to this area to upload</p>
-                    <p className='ant-upload-hint'>
-                        Support for a single or bulk upload. Strictly prohibit from uploading company data or other
-                        band files
+                        className='dragger'
+                        showUploadList={false}
+                        name='file'
+                        multiple={true}>
+                        <p className='ant-upload-drag-icon'>
+                            <Icon type='inbox' />
+                        </p>
+                        <p className='ant-upload-text'>Click or drag file to this area to upload</p>
+                        <p className='ant-upload-hint'>
+                            Support for a single or bulk upload. Strictly prohibit from uploading company data or other
+                            band files
                     </p>
                     </Dragger>
                 </div>

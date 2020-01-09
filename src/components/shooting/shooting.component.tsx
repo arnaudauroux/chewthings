@@ -7,6 +7,7 @@ import { Modal, Icon } from 'antd';
 import ShootingsService from '../../services/shootings.service';
 import Dragger from 'antd/lib/upload/Dragger';
 import { RcCustomRequestOptions } from 'antd/lib/upload/interface';
+import PhotoCard from '../photo-card/photo-card.component';
 
 interface ShootingParams {
     shootingName: string;
@@ -19,7 +20,8 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
         previewVisible: false,
         previewImage: ''
     };
-    shootingsService: ShootingsService;
+
+    private shootingsService: ShootingsService;
 
     constructor(props: RouteChildrenProps<ShootingParams>) {
         super(props);
@@ -30,9 +32,8 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
 
     public async refreshPhotosList() {
         if (this.props.match) {
-            this.shootingsService.getShootingPhotosAsync(this.props.match.params.shootingName).then(photos => {
-                this.setState({ photos });
-            });
+            const photos = await this.shootingsService.getShootingPhotosAsync(this.props.match.params.shootingName);
+            this.setState({ photos });
         }
     }
 
@@ -40,7 +41,6 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
         if (this.props.match) {
             await this.shootingsService.AddPhotoAsync(
                 this.props.match.params.shootingName,
-                'test',
                 options.file
             );
         }
@@ -60,27 +60,27 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
         return (
             <React.Fragment>
                 <div className='shooting-photos-grid'>
-                    {this.state.photos.map((photo: Photo, inde: number) => {
-                        return <div>{photo.name}</div>;
-                    })}
+                    {this.state.photos.map((photo: Photo, index: number) => <PhotoCard key={index} shootingName={this.props.match?.params?.shootingName} photo={photo} />)}
                 </div>
-                <div className='dragger-container'>
-                    <Dragger
-                        customRequest={this.upload}
-                        className='dragger'
-                        showUploadList={false}
-                        name='file'
-                        multiple={true}>
-                        <p className='ant-upload-drag-icon'>
-                            <Icon type='inbox' />
-                        </p>
-                        <p className='ant-upload-text'>Click or drag file to this area to upload</p>
-                        <p className='ant-upload-hint'>
-                            Support for a single or bulk upload. Strictly prohibit from uploading company data or other
-                            band files
-                    </p>
-                    </Dragger>
-                </div>
+                {this.state.photos.length === 0 && (
+                    <div className='dragger-container'>
+                        <Dragger
+                            customRequest={this.upload}
+                            className='dragger'
+                            showUploadList={false}
+                            name='file'
+                            multiple={true}>
+                            <p className='ant-upload-drag-icon'>
+                                <Icon type='inbox' />
+                            </p>
+                            <p className='ant-upload-text'>Click or drag file to this area to upload</p>
+                            <p className='ant-upload-hint'>
+                                Support for a single or bulk upload. Strictly prohibit from uploading company data or other
+                                band files
+                            </p>
+                        </Dragger>
+                    </div>
+                )}
                 <Modal visible={this.state.previewVisible} footer={null} onCancel={this.handleCancel}>
                     <img alt='example' style={{ width: '100%' }} src={this.state.previewImage} />
                 </Modal>

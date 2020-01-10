@@ -3,7 +3,7 @@ import { RouteChildrenProps } from 'react-router-dom';
 import './shooting.component.css';
 import 'antd/dist/antd.css';
 import Photo from '../../models/photo.model';
-import { Modal, Icon } from 'antd';
+import { Modal, Icon, Tooltip, Button, Upload } from 'antd';
 import ShootingsService from '../../services/shootings.service';
 import Dragger from 'antd/lib/upload/Dragger';
 import { RcCustomRequestOptions } from 'antd/lib/upload/interface';
@@ -43,6 +43,8 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
                 this.props.match.params.shootingName,
                 options.file
             );
+
+            this.refreshPhotosList();
         }
     }
 
@@ -56,11 +58,16 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
 
     }
 
+    addPhotos = () => {
+
+    }
+
     render() {
         return (
             <React.Fragment>
                 <div className='shooting-photos-grid'>
-                    {this.state.photos.map((photo: Photo, index: number) => <PhotoCard key={index} shootingName={this.props.match?.params?.shootingName} photo={photo} />)}
+                    {this.state.photos.map((photo: Photo, index: number) =>
+                        <PhotoCard key={index} shootingName={this.props.match?.params?.shootingName} photo={photo} />)}
                 </div>
                 {this.state.photos.length === 0 && (
                     <div className='dragger-container'>
@@ -81,6 +88,22 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
                         </Dragger>
                     </div>
                 )}
+
+                <Upload
+                    customRequest={this.upload}
+                    showUploadList={false}
+                    multiple={true}>
+                    <Tooltip
+                        placement='topLeft'
+                        title='Ajouter des photos'>
+                        <Button
+                            className='main-button'
+                            type='primary'
+                            shape='circle'
+                            icon='plus'
+                            onClick={this.addPhotos} />
+                    </Tooltip>
+                </Upload>
                 <Modal visible={this.state.previewVisible} footer={null} onCancel={this.handleCancel}>
                     <img alt='example' style={{ width: '100%' }} src={this.state.previewImage} />
                 </Modal>

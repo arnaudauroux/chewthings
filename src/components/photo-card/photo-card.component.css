@@ -1,12 +1,10 @@
-.shooting-card {
+.photo-card {
   width: 20rem;
   margin: 2rem 0 0 2rem;
 }
 
-.shooting-card img {
+.photo-card img {
   width: 100%;
-}
-
-.shooting-card-default{
+  height: 10rem;
   opacity: 75%;
 }

@@ -62,6 +62,19 @@ class ShootingsService {
 
         return await downloadBlockBlobResponse.blobBody;
     }
+
+    public async DeletePhotoAsync(shootingName: string, fileName: string) {
+        await this.blobServiceClient
+            .getContainerClient(shootingName)
+            .getBlobClient(fileName)
+            .delete();
+    }
+
+    public async DeleteShootingAsync(shootingName: string) {
+        await this.blobServiceClient
+            .getContainerClient(shootingName)
+            .delete();
+    }
 }
 
 export default ShootingsService;

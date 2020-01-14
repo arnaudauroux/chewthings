@@ -10,19 +10,19 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className='layout-root'>
-        <div className='header'>
-          <Header />
-        </div>
-        <div className='content'>
-          <Router>
+      <Router>
+        <div className='layout-root'>
+          <div className='header'>
+            <Header />
+          </div>
+          <div className='content'>
             <Switch>
               <Route exact path='/' component={ShootingsList} />
               <Route path='/:shootingName' component={Shooting} />
             </Switch>
-          </Router>
+          </div>
         </div>
-      </div>
+      </Router>
     );
   }
 }

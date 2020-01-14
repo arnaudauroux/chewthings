@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tooltip, Button, Modal, Empty, Input, Spin, Icon, notification } from 'antd';
+import { Tooltip, Button, Modal, Empty, Input, Spin, notification } from 'antd';
 import ShootingCard from '../shooting-card/shooting-card.component';
 import ShootingsService from '../../services/shootings.service';
 import Shooting from '../../models/shooting.model';
@@ -59,11 +59,11 @@ class ShootingsList extends React.Component {
     }
 
     openNotification = () => {
-        notification.open({
+        notification.success({
             message: 'Shooting créé',
+            duration: null,
             description:
-                `Le dossier du shooting ${this.state.newShootingName} a été correctement créé !`,
-            icon: <Icon type='smile' style={{ color: '#108ee9' }} />
+                `Le dossier du shooting ${this.state.newShootingName} a été correctement créé !`
         });
     }
 
@@ -73,11 +73,20 @@ class ShootingsList extends React.Component {
         this.setState({ shootings });
     }
 
+    deleteShooting = async (shooting: Shooting) => {
+        await this.shootingsService.DeleteShootingAsync(shooting.name);
+        this.refreshShootingsList();
+    }
+
     render() {
         return (
             <React.Fragment>
                 <div className='grid'>
-                    {this.state.shootings.map((value, index) => <ShootingCard key={index} shooting={value} />)}
+                    {this.state.shootings.map((value, index) =>
+                        <ShootingCard
+                            key={index}
+                            shooting={value}
+                            onDeleteShooting={this.deleteShooting} />)}
                 </div>
                 <Tooltip
                     placement='topLeft'

@@ -3,10 +3,10 @@ import { RouteChildrenProps } from 'react-router-dom';
 import './shooting.component.css';
 import 'antd/dist/antd.css';
 import Photo from '../../models/photo.model';
-import { Modal, Icon, Tooltip, Button, Upload } from 'antd';
+import { Modal, Icon, Tooltip, Button, Upload, notification } from 'antd';
 import ShootingsService from '../../services/shootings.service';
 import Dragger from 'antd/lib/upload/Dragger';
-import { RcCustomRequestOptions } from 'antd/lib/upload/interface';
+import { RcCustomRequestOptions, UploadChangeParam, UploadFile } from 'antd/lib/upload/interface';
 import PhotoCard from '../photo-card/photo-card.component';
 
 interface ShootingParams {
@@ -23,43 +23,61 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
 
     private shootingsService: ShootingsService;
 
+    private shootingName: string;
+
     constructor(props: RouteChildrenProps<ShootingParams>) {
         super(props);
 
+        if (!this.props.match?.params?.shootingName) {
+            throw new Error();
+        }
+
         this.shootingsService = new ShootingsService();
-        this.refreshPhotosList();
+        this.shootingName = this.props.match.params.shootingName;
+
+        this.refreshPhotosListAsync();
     }
 
-    public async refreshPhotosList() {
-        if (this.props.match) {
-            const photos = await this.shootingsService.getShootingPhotosAsync(this.props.match.params.shootingName);
-            this.setState({ photos });
-        }
+    public async refreshPhotosListAsync() {
+        const photos = await this.shootingsService.getShootingPhotosAsync(this.shootingName);
+        this.setState({ photos });
     }
 
     upload = async (options: RcCustomRequestOptions) => {
-        if (this.props.match) {
-            await this.shootingsService.AddPhotoAsync(
-                this.props.match.params.shootingName,
-                options.file
-            );
+        try {
+            await this.shootingsService.AddPhotoAsync(this.shootingName, options.file);
+        } catch (error) {
+            options.onError(error);
+            return;
+        }
 
-            this.refreshPhotosList();
+        options.onSuccess({}, options.file);
+
+        this.refreshPhotosListAsync();
+    }
+
+    handleChange = (change: UploadChangeParam<UploadFile<any>>) => {
+        const uploadedFilesCount = change.fileList.filter(f => f.status === 'done').length;
+        notification.info({
+            key: 'infos',
+            message: 'Envoie des photos',
+            duration: null,
+            description:
+                `${uploadedFilesCount} / ${change.fileList.length} fichiers envoyés.`
+        });
+
+        if (uploadedFilesCount === change.fileList.length) {
+            setTimeout(() => notification.close('infos'), 1000);
         }
     }
 
-    handleChange = () => {
-
-    }
-    handlePreview = () => {
-
-    }
     handleCancel = () => {
 
     }
 
-    addPhotos = () => {
-
+    deletePhoto = async (photo: Photo) => {
+        await this.shootingsService.DeletePhotoAsync(this.shootingName, photo.name);
+        this.refreshPhotosListAsync();
     }
 
     render() {
@@ -67,11 +85,17 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
             <React.Fragment>
                 <div className='shooting-photos-grid'>
                     {this.state.photos.map((photo: Photo, index: number) =>
-                        <PhotoCard key={index} shootingName={this.props.match?.params?.shootingName} photo={photo} />)}
+                        <PhotoCard
+                            key={index}
+                            shootingName={this.props.match?.params?.shootingName}
+                            photo={photo}
+                            onDeletePhoto={this.deletePhoto}
+                        />)}
                 </div>
                 {this.state.photos.length === 0 && (
                     <div className='dragger-container'>
                         <Dragger
+                            onChange={this.handleChange}
                             customRequest={this.upload}
                             className='dragger'
                             showUploadList={false}
@@ -90,6 +114,7 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
                 )}
 
                 <Upload
+                    onChange={this.handleChange}
                     customRequest={this.upload}
                     showUploadList={false}
                     multiple={true}>
@@ -100,8 +125,7 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
                             className='main-button'
                             type='primary'
                             shape='circle'
-                            icon='plus'
-                            onClick={this.addPhotos} />
+                            icon='plus' />
                     </Tooltip>
                 </Upload>
                 <Modal visible={this.state.previewVisible} footer={null} onCancel={this.handleCancel}>

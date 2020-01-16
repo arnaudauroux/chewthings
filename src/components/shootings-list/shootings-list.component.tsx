@@ -12,7 +12,8 @@ class ShootingsList extends React.Component {
         visible: false,
         creatingShooting: false,
         newShootingName: '',
-        shootings: Array<Shooting>()
+        shootings: Array<Shooting>(),
+        isLoading: true
     };
 
     private shootingsService: ShootingsService;
@@ -21,13 +22,14 @@ class ShootingsList extends React.Component {
         super(props);
 
         this.shootingsService = new ShootingsService();
+    }
+
+    componentDidMount() {
         this.refreshShootingsList();
     }
 
     showModal = () => {
-        this.setState({
-            visible: true
-        });
+        this.setState({ visible: true });
     }
 
     handleOk = async () => {
@@ -68,9 +70,11 @@ class ShootingsList extends React.Component {
     }
 
     async refreshShootingsList() {
+        this.setState({ isLoading: true });
+
         const shootings = await this.shootingsService.getShootingsAsync();
 
-        this.setState({ shootings });
+        this.setState({ isLoading: false, shootings });
     }
 
     deleteShooting = async (shooting: Shooting) => {
@@ -80,7 +84,7 @@ class ShootingsList extends React.Component {
 
     render() {
         return (
-            <React.Fragment>
+            <div className='shootings-root'>
                 <div className='grid'>
                     {this.state.shootings.map((value, index) =>
                         <ShootingCard
@@ -88,33 +92,41 @@ class ShootingsList extends React.Component {
                             shooting={value}
                             onDeleteShooting={this.deleteShooting} />)}
                 </div>
-                <Tooltip
-                    placement='topLeft'
-                    title='Ajouter un shooting'>
-                    <Button
-                        className='main-button'
-                        type='primary'
-                        shape='circle'
-                        icon='plus'
-                        onClick={this.showModal} />
-                </Tooltip>
-                <Modal
-                    title='Ajouter un shooting'
-                    visible={this.state.visible}
-                    cancelText='Annuler'
-                    onOk={this.handleOk}
-                    onCancel={this.handleCancel}>
-                    <Input
-                        hidden={this.state.creatingShooting}
-                        placeholder='Nom du shooting'
-                        onChange={this.onShootingNameChanged} />
-                    <Spin
-                        tip='Création en cours...'
-                        className='shooting-spin'
-                        spinning={this.state.creatingShooting} />
-                </Modal>
-                {this.state.shootings.length === 0 ? <Empty className='empty-status' description='Aucun shooting' /> : null}
-            </React.Fragment>
+                {!this.state.isLoading && (
+                    <React.Fragment>
+                        <Tooltip
+                            placement='topLeft'
+                            title='Ajouter un shooting'>
+                            <Button
+                                className='main-button'
+                                type='primary'
+                                shape='circle'
+                                icon='plus'
+                                onClick={this.showModal} />
+                        </Tooltip>
+                        <Modal
+                            title='Ajouter un shooting'
+                            visible={this.state.visible}
+                            cancelText='Annuler'
+                            onOk={this.handleOk}
+                            onCancel={this.handleCancel}>
+                            <Input
+                                hidden={this.state.creatingShooting}
+                                placeholder='Nom du shooting'
+                                onChange={this.onShootingNameChanged} />
+                            <Spin
+                                tip='Création en cours...'
+                                className='shooting-spin'
+                                spinning={this.state.creatingShooting} />
+                        </Modal>
+                    </React.Fragment>
+                )}
+                <Spin
+                    size='large'
+                    spinning={this.state.isLoading}
+                    className='shooting-spin' />
+                {!this.state.isLoading && this.state.shootings.length === 0 ? <Empty className='empty-status' description='Aucun shooting' /> : null}
+            </div>
         );
     }
 }

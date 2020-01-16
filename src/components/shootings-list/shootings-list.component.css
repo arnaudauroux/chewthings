@@ -1,3 +1,9 @@
+.shootings-root {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+}
+
 .main-button {
   position: fixed;
   right: 0;
@@ -15,13 +21,16 @@
   align-items: center;
 }
 
-.shooting-spin {
-  width: 100%;
-}
-
 .grid {
   display: -webkit-flex; /* Safari */
   -webkit-flex-wrap: wrap; /* Safari 6.1+ */
   display: flex;
   flex-wrap: wrap;
+}
+
+.shooting-spin {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

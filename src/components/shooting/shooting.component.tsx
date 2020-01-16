@@ -3,7 +3,7 @@ import { RouteChildrenProps } from 'react-router-dom';
 import './shooting.component.css';
 import 'antd/dist/antd.css';
 import Photo from '../../models/photo.model';
-import { Modal, Icon, Tooltip, Button, Upload, notification } from 'antd';
+import { Modal, Icon, Tooltip, Button, Upload, notification, Spin } from 'antd';
 import ShootingsService from '../../services/shootings.service';
 import Dragger from 'antd/lib/upload/Dragger';
 import { RcCustomRequestOptions, UploadChangeParam, UploadFile } from 'antd/lib/upload/interface';
@@ -18,7 +18,8 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
     state = {
         photos: Array<Photo>(),
         previewVisible: false,
-        previewImage: ''
+        previewImage: '',
+        isLoading: true
     };
 
     private shootingsService: ShootingsService;
@@ -34,13 +35,18 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
 
         this.shootingsService = new ShootingsService();
         this.shootingName = this.props.match.params.shootingName;
+    }
 
+    componentDidMount() {
         this.refreshPhotosListAsync();
     }
 
     public async refreshPhotosListAsync() {
+        this.setState({ isLoading: true });
+
         const photos = await this.shootingsService.getShootingPhotosAsync(this.shootingName);
-        this.setState({ photos });
+
+        this.setState({ isLoading: false, photos });
     }
 
     upload = async (options: RcCustomRequestOptions) => {
@@ -82,7 +88,7 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
 
     render() {
         return (
-            <React.Fragment>
+            <div className='shooting-root'>
                 <div className='shooting-photos-grid'>
                     {this.state.photos.map((photo: Photo, index: number) =>
                         <PhotoCard
@@ -92,7 +98,7 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
                             onDeletePhoto={this.deletePhoto}
                         />)}
                 </div>
-                {this.state.photos.length === 0 && (
+                {!this.state.isLoading && this.state.photos.length === 0 && (
                     <div className='dragger-container'>
                         <Dragger
                             onChange={this.handleChange}
@@ -112,26 +118,33 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
                         </Dragger>
                     </div>
                 )}
-
-                <Upload
-                    onChange={this.handleChange}
-                    customRequest={this.upload}
-                    showUploadList={false}
-                    multiple={true}>
-                    <Tooltip
-                        placement='topLeft'
-                        title='Ajouter des photos'>
-                        <Button
-                            className='main-button'
-                            type='primary'
-                            shape='circle'
-                            icon='plus' />
-                    </Tooltip>
-                </Upload>
-                <Modal visible={this.state.previewVisible} footer={null} onCancel={this.handleCancel}>
-                    <img alt='example' style={{ width: '100%' }} src={this.state.previewImage} />
-                </Modal>
-            </React.Fragment >
+                {!this.state.isLoading && (
+                    <React.Fragment>
+                        <Upload
+                            onChange={this.handleChange}
+                            customRequest={this.upload}
+                            showUploadList={false}
+                            multiple={true}>
+                            <Tooltip
+                                placement='topLeft'
+                                title='Ajouter des photos'>
+                                <Button
+                                    className='main-button'
+                                    type='primary'
+                                    shape='circle'
+                                    icon='plus' />
+                            </Tooltip>
+                        </Upload>
+                        <Modal visible={this.state.previewVisible} footer={null} onCancel={this.handleCancel}>
+                            <img alt='example' style={{ width: '100%' }} src={this.state.previewImage} />
+                        </Modal>
+                    </React.Fragment>
+                )}
+                <Spin
+                    size='large'
+                    spinning={this.state.isLoading}
+                    className='shooting-spin' />
+            </div>
         );
     }
 }

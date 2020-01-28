@@ -5,8 +5,11 @@ import ShootingsService from '../../services/shootings.service';
 import Shooting from '../../models/shooting.model';
 import './shootings-list.component.css';
 import 'antd/dist/antd.css';
+import { withRouter } from 'react-router';
+import { RouteComponentProps } from 'react-router-dom';
+import { connect } from 'react-redux';
 
-class ShootingsList extends React.Component {
+class ShootingsList extends React.Component<RouteComponentProps> {
 
     state = {
         visible: false,
@@ -18,10 +21,12 @@ class ShootingsList extends React.Component {
 
     private shootingsService: ShootingsService;
 
-    constructor(props: Readonly<{}>) {
+    constructor(props: any) {
         super(props);
 
         this.shootingsService = new ShootingsService();
+
+        props.dispatch({ type: 'SHOOTING_SELECTED', value: null });
     }
 
     componentDidMount() {
@@ -55,9 +60,7 @@ class ShootingsList extends React.Component {
     }
 
     onShootingNameChanged = (event: any) => {
-        this.setState({
-            newShootingName: event.target.value
-        });
+        this.setState({ newShootingName: event.target.value });
     }
 
     openNotification = () => {
@@ -77,9 +80,13 @@ class ShootingsList extends React.Component {
         this.setState({ isLoading: false, shootings });
     }
 
-    deleteShooting = async (shooting: Shooting) => {
+    onDeleteShooting = async (shooting: Shooting) => {
         await this.shootingsService.DeleteShootingAsync(shooting.name);
         this.refreshShootingsList();
+    }
+
+    onShootingSelected = async (shooting: Shooting) => {
+        this.props.history.push(`/${shooting.name}`);
     }
 
     render() {
@@ -90,7 +97,8 @@ class ShootingsList extends React.Component {
                         <ShootingCard
                             key={index}
                             shooting={value}
-                            onDeleteShooting={this.deleteShooting} />)}
+                            onShootingSelected={this.onShootingSelected}
+                            onDeleteShooting={this.onDeleteShooting} />)}
                 </div>
                 {!this.state.isLoading && (
                     <React.Fragment>
@@ -131,4 +139,4 @@ class ShootingsList extends React.Component {
     }
 }
 
-export default ShootingsList;
+export default connect()(withRouter(ShootingsList));

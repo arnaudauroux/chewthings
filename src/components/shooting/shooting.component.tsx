@@ -8,6 +8,7 @@ import ShootingsService from '../../services/shootings.service';
 import Dragger from 'antd/lib/upload/Dragger';
 import { RcCustomRequestOptions, UploadChangeParam, UploadFile } from 'antd/lib/upload/interface';
 import PhotoCard from '../photo-card/photo-card.component';
+import { connect } from 'react-redux';
 
 interface ShootingParams {
     shootingName: string;
@@ -26,7 +27,7 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
 
     private shootingName: string;
 
-    constructor(props: RouteChildrenProps<ShootingParams>) {
+    constructor(props: any) {
         super(props);
 
         if (!this.props.match?.params?.shootingName) {
@@ -35,6 +36,8 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
 
         this.shootingsService = new ShootingsService();
         this.shootingName = this.props.match.params.shootingName;
+
+        props.dispatch({ type: 'SHOOTING_SELECTED', value: this.shootingName });
     }
 
     componentDidMount() {
@@ -149,4 +152,4 @@ class Shooting extends React.Component<RouteChildrenProps<ShootingParams>, any> 
     }
 }
 
-export default Shooting;
+export default connect()(Shooting);

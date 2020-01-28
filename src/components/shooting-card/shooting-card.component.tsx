@@ -1,14 +1,13 @@
 import React from 'react';
 import { Card, Icon, Avatar, Popconfirm } from 'antd';
-import { withRouter } from 'react-router';
 import './shooting-card.component.css';
 import 'antd/dist/antd.css';
 
 const { Meta } = Card;
 
 class ShootingCard extends React.Component<any> {
-    redirectToShootingPage = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        this.props.history.push(`/${this.props.shooting.name}`);
+    onShootingSelected = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        this.props.onShootingSelected(this.props.shooting);
     }
 
     onDelete = async (event: any) => {
@@ -22,7 +21,7 @@ class ShootingCard extends React.Component<any> {
                 hoverable
                 cover={
                     <img
-                        onClick={this.redirectToShootingPage}
+                        onClick={this.onShootingSelected}
                         className='shooting-card-default'
                         alt='example'
                         src='https://cdn.pixabay.com/photo/2017/08/06/09/52/black-and-white-2590810_1280.jpg' />
@@ -39,7 +38,7 @@ class ShootingCard extends React.Component<any> {
                         <Icon type='delete' key='delete' />
                     </Popconfirm>
                 ]}>
-                <div onClick={this.redirectToShootingPage}>
+                <div onClick={this.onShootingSelected}>
                     <Meta
                         avatar={<Avatar src='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png' />}
                         title={this.props.shooting.name}
@@ -50,4 +49,4 @@ class ShootingCard extends React.Component<any> {
     }
 }
 
-export default withRouter(ShootingCard);
+export default ShootingCard;

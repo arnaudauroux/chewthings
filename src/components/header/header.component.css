@@ -7,7 +7,17 @@
   height: 100%;
 }
 
-.headerRoot span {
+.appName {
   font-weight: 700;
   font-size: large;
+}
+
+.title {
+  margin-left: 2rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  background-color: #1890ff;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
